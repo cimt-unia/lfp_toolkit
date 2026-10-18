@@ -7,13 +7,13 @@ This library provides functions for signal cleaning, epoch extraction, and time-
 
 ## Installation
 
-Install the latest version directly from the repository:
+Install the latest version:
 
 ```bash
 python -m pip install --user git+https://github.com/cimt-unia/lfp_toolkit.git
 ```
 
-*Note: The `git+` prefix is required by pip to resolve and clone version control URLs.*
+<br>
 
 For local development:
 
@@ -27,7 +27,6 @@ python -m pip install -e .
 
 ## Usage
 
-The pipeline consists of loading raw data, applying signal cleaning, extracting epochs into a 4D tensor, and computing time-frequency representations.
 
 ```python
 from pathlib import Path
@@ -79,7 +78,7 @@ generate_tfr_plots(tfr_cfg)
 
 ## Architecture
 
-The library is decoupled into single-responsibility modules.
+The library is decoupled into individual modules.
 
 | Module | Description |
 |---|---|
