@@ -7,7 +7,6 @@ This library provides functions for signal cleaning, epoch extraction, and time-
 
 ## Installation
 
-Install the latest version:
 
 ```bash
 python -m pip install --user git+https://github.com/cimt-unia/lfp_toolkit.git
@@ -15,7 +14,7 @@ python -m pip install --user git+https://github.com/cimt-unia/lfp_toolkit.git
 
 <br>
 
-For local development:
+
 
 ```bash
 git clone https://github.com/cimt-unia/lfp_toolkit.git
@@ -78,7 +77,6 @@ generate_tfr_plots(tfr_cfg)
 
 ## Architecture
 
-The library is decoupled into individual modules.
 
 | Module | Description |
 |---|---|
@@ -93,7 +91,7 @@ The library is decoupled into individual modules.
 
 ## Configuration
 
-Parameters are managed via Pydantic `BaseModel` classes (`CleaningConfig`, `EpochingConfig`, `TFRConfig`). This enforces type checking at runtime and prevents invalid pipeline states.
+
 
 ```python
 from lfp_toolkit import CleaningConfig
