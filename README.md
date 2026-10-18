@@ -1,6 +1,7 @@
 # LFP toolkit
 
-This package provides functions to clean signals, extract epochs, and analyze time-frequency representations on local field potentials (iEEG).
+The package provides functions for signal cleaning, epoch extraction, and time-frequency analysis on iEEG.
+
 
 <br>
 
