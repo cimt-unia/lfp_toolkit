@@ -170,29 +170,60 @@ def _detect_dead_segments(sig: NDArray[np.float64], sfreq: float, window_sec: fl
         if (e - s) >= min_dead_samples: final_mask[s:e] = True
     return final_mask
 
-def _reconstruct_dead_segments(sig: NDArray[np.float64], dead_mask: NDArray[np.bool_], sfreq: float, context_sec: float = 2.0, rng: np.random.Generator | None = None) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
+def _reconstruct_dead_segments(
+    sig: NDArray[np.float64], 
+    dead_mask: NDArray[np.bool_], 
+    sfreq: float, 
+    context_sec: float = 2.0, 
+    rng: np.random.Generator | None = None
+) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
+    """
+    Reconstruct dead/flat segments via spectral matching from surrounding healthy context.
+    Excludes both NaN values and samples flagged in dead_mask from the context window 
+    to prevent biasing the PSD and RMS calculations.
+    """
     out = sig.copy()
     recon_mask = np.zeros_like(dead_mask)
-    if not dead_mask.any(): return out, recon_mask
-    if rng is None: rng = np.random.default_rng()
+    if not dead_mask.any(): 
+        return out, recon_mask
+        
+    if rng is None: 
+        rng = np.random.default_rng()
 
     diff = np.diff(dead_mask.astype(int))
     starts = np.where(diff == 1)[0] + 1
     ends = np.where(diff == -1)[0] + 1
-    if dead_mask[0]: starts = np.concatenate([[0], starts])
-    if dead_mask[-1]: ends = np.concatenate([ends, [len(dead_mask)]])
+    if dead_mask[0]: 
+        starts = np.concatenate([[0], starts])
+    if dead_mask[-1]: 
+        ends = np.concatenate([ends, [len(dead_mask)]])
 
     context_samples = int(context_sec * sfreq)
+    
     for start, end in zip(starts, ends):
         length = end - start
-        if length == 0: continue
-        ctx_before = sig[max(0, start - context_samples):start]
-        ctx_after = sig[end:min(len(sig), end + context_samples)]
+        if length == 0: 
+            continue
+            
+        # Define context boundaries
+        ctx_before_start = max(0, start - context_samples)
+        ctx_after_end = min(len(sig), end + context_samples)
         
-        # Exclude dead samples from context
-        ctx_before = ctx_before[~np.isnan(ctx_before)]
-        ctx_after = ctx_after[~np.isnan(ctx_after)]
-        context_data = np.concatenate([ctx_before, ctx_after])
+        ctx_before = sig[ctx_before_start:start]
+        ctx_after = sig[end:ctx_after_end]
+        
+        # Get corresponding mask slices
+        mask_before = dead_mask[ctx_before_start:start]
+        mask_after = dead_mask[end:ctx_after_end]
+        
+        # Exclude BOTH dead_mask samples and NaNs from context
+        valid_before = ~mask_before & ~np.isnan(ctx_before)
+        valid_after = ~mask_after & ~np.isnan(ctx_after)
+        
+        ctx_before_clean = ctx_before[valid_before]
+        ctx_after_clean = ctx_after[valid_after]
+        
+        context_data = np.concatenate([ctx_before_clean, ctx_after_clean])
 
         if len(context_data) < 10:
             out[start:end] = 0.0
@@ -202,29 +233,35 @@ def _reconstruct_dead_segments(sig: NDArray[np.float64], dead_mask: NDArray[np.b
         nperseg = min(len(context_data), max(8, int(sfreq * 1.0)))
         freqs, psd = welch(context_data, fs=sfreq, nperseg=nperseg, window="hann")
         
-        # FIX: Interpolate PSD to target frequencies to prevent pitch-shifting
+        # Interpolate PSD to target frequencies to prevent pitch-shifting
         target_f = np.fft.rfftfreq(length, d=1.0 / sfreq)
         psd_interp = np.interp(target_f, freqs, psd)
         amp = np.sqrt(np.maximum(psd_interp, 0.0) * sfreq * length / 2)
         
         phases = rng.uniform(0, 2 * np.pi, target_f.size)
         phases[0] = 0.0
-        if length % 2 == 0: phases[-1] = 0.0
+        if length % 2 == 0: 
+            phases[-1] = 0.0  # Nyquist must be real
         
         spectrum = amp * np.exp(1j * phases)
         surrogate = np.fft.irfft(spectrum, n=length)
 
+        # Scale surrogate to match local RMS of healthy context
         context_rms = np.sqrt(np.mean(context_data ** 2))
         surrogate_rms = np.sqrt(np.mean(surrogate ** 2))
-        if surrogate_rms > 0: surrogate *= context_rms / surrogate_rms
+        if surrogate_rms > 0: 
+            surrogate *= context_rms / surrogate_rms
 
-        fade_len = min(int(0.02 * sfreq), length // 4) # Time-based fade (20ms)
+        # Time-based fade (20ms or 25% of gap length, whichever is smaller)
+        fade_len = min(int(0.02 * sfreq), length // 4) 
         if fade_len > 0:
             surrogate[:fade_len] *= np.linspace(0, 1, fade_len)
-            if length > fade_len: surrogate[-fade_len:] *= np.linspace(1, 0, fade_len)
+            if length > fade_len: 
+                surrogate[-fade_len:] *= np.linspace(1, 0, fade_len)
 
         out[start:end] = surrogate
         recon_mask[start:end] = True
+        
     return out, recon_mask
 
 def _detect_ekg_peaks(sig: NDArray[np.float64], params: _EKGParams) -> list[int]:
