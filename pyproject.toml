@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "lfp-toolkit"
 version = "0.1.0"
-description = "Modular toolkit for LFP I/O, cleaning, epoching, and TFR analysis."
+description = "A Python library for processing data from intracranial electrodes."
 requires-python = ">=3.9"
 dependencies = [
     "numpy>=1.22",
@@ -15,3 +15,7 @@ dependencies = [
     "matplotlib>=3.5",
     "pydantic>=2.0",
 ]
+
+[tool.setuptools.packages.find]
+include = ["lfp_toolkit*"]
+exclude = ["notebooks*", "tests*", "docs*", "examples*"]
