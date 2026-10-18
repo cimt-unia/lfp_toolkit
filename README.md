@@ -1,6 +1,6 @@
 # LFP toolkit
 
-A Python library for processing data from intracranial electrodes. It provides functions for signal cleaning, epoch extraction, and time-frequency analysis.
+Library for processing data from intracranial electrodes. It provides functions for signal cleaning, epoch extraction, and time-frequency analysis.
 
 
 <br>
