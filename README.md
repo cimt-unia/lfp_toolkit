@@ -1,6 +1,6 @@
 # LFP toolkit
 
-This package provides functions for signal cleaning, epoch extraction, and time-frequency representation analysis for Local Field Potential data.
+This package provides functions for cleaning signals, extracting epochs, and analyzing time-frequency representations for Local Field Potential data.
 
 <br>
 
