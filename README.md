@@ -1,6 +1,6 @@
 # LFP toolkit
 
-Library for processing data from intracranial electrodes. It provides functions for signal cleaning, epoch extraction, and time-frequency analysis.
+This library provides functions for signal cleaning, epoch extraction, and time-frequency analysis.
 
 
 <br>
