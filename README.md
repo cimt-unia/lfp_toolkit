@@ -1,3 +1,9 @@
+### `lfp_toolkit` Library
+
+I/O handling, signal cleaning, visualization, epoching, and TFR analysis.
+
+#### Directory Layout
+```text
 lfp_toolkit/
 ├── pyproject.toml
 ├── lfp_toolkit/
@@ -10,3 +16,4 @@ lfp_toolkit/
 │   └── tfr.py
 └── examples/
     └── run_pipeline.py
+```
