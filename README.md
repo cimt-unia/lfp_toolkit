@@ -1,6 +1,6 @@
 # LFP toolkit
 
-The package provides functions for signal cleaning, epoch extraction, and time-frequency analysis on iEEG.
+A Python library for processing data from intracranial electrodes. It provides functions for signal cleaning, epoch extraction, and time-frequency analysis.
 
 
 <br>
