@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lfp-toolkit"
+version = "0.1.0"
+description = "Modular toolkit for LFP I/O, cleaning, epoching, and TFR analysis."
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.22",
+    "scipy>=1.8",
+    "pandas>=1.4",
+    "mne>=1.0",
+    "matplotlib>=3.5",
+    "pydantic>=2.0",
+]
