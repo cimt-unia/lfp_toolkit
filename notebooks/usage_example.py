@@ -1,3 +1,5 @@
+# Usage Example
+
 import logging
 from pathlib import Path
 from lfp_toolkit import (
